@@ -70,7 +70,7 @@ function match(c) {
 function draw() {
   shown = CARDS.filter(match);
   $('#grid').innerHTML = shown.length ? shown.map((c, i) => `<button class="tile" data-i="${i}" aria-label="${esc(label(c))}, ${esc(sub(c))}">
-      <img src="cards/${c.id}.webp" alt="${esc(label(c))} card" width="420" height="588" loading="${i < 12 ? 'eager' : 'lazy'}">
+      <img src="${c.id}.webp" alt="${esc(label(c))} card" width="420" height="588" loading="${i < 12 ? 'eager' : 'lazy'}">
       <span>${esc(label(c))}</span><small>${esc(sub(c))}</small></button>`).join('')
     : '<p class="empty">No cards match these filters. Clear the filters to see all cards.</p>';
   $('#count').textContent = `Showing ${shown.length} of ${CARDS.length} cards`;
@@ -80,7 +80,7 @@ function draw() {
 }
 function open(i) {
   cur = i; const c = shown[i], d = $('#lb');
-  $('#lb-img').src = `full/${c.id}.webp`; $('#lb-img').alt = `${label(c)} trading card`;
+  $('#lb-img').src = `${c.id}.webp`; $('#lb-img').alt = `${label(c)} trading card`;
   $('#lb-name').textContent = label(c);
   const rows = [['Type', c.type === 'charm' ? 'Charm' : EL[c.el]]];
   if (c.type !== 'element') rows.push(['Card', `${c.n} of 82`]);
