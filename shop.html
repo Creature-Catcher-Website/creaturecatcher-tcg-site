@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop | Creature Catcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)">Shop</h1><p>Packs and boxes from our First Edition set.</p></div></div>
+  <div class="wrap" style="padding-bottom:88px">
+    <div class="shop-tools">
+      <label for="sort">Sort by</label>
+      <select id="sort"><option value="rec">Recommended</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option></select>
+      <label for="stock"><input type="checkbox" id="stock" style="width:auto;margin-right:6px">In stock only</label>
+      <span id="count" style="margin-left:auto;color:var(--muted)"></span>
+    </div>
+    <div class="products" id="products"></div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+function draw() {
+  let list = [...PRODUCTS];
+  if ($('#stock').checked) list = list.filter(p => p.inStock);
+  const s = $('#sort').value;
+  if (s === 'lo') list.sort((a, b) => unit(a) - unit(b)); if (s === 'hi') list.sort((a, b) => unit(b) - unit(a));
+  $('#products').innerHTML = list.length ? list.map(productCard).join('') : '<p class="empty">No products match. Clear the in-stock filter to see everything.</p>';
+  $('#count').textContent = list.length + (list.length === 1 ? ' product' : ' products');
+}
+document.addEventListener('DOMContentLoaded', () => { $('#sort').onchange = draw; $('#stock').onchange = draw; draw(); });
+</script>
+</body>
+</html>
