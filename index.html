@@ -7,7 +7,7 @@
 <meta name="description" content="Creature Catcher is a trading card community. Buy packs and boxes, get cards evaluated, and browse the full 1st Edition set.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="icon" href="favicon.png" type="image/png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -25,10 +25,10 @@
         </div>
       </div>
       <div class="hand" aria-label="Four creature cards from the 1st Edition set">
-        <a href="gallery.html?card=03-bloraine" aria-label="Bloraine, Bio creature"><img src="images/cards/03-bloraine.webp" alt="Bloraine trading card" width="420" height="588"></a>
-        <a href="gallery.html?card=15-pyrite" aria-label="Pyrite, Pyro creature"><img src="images/cards/15-pyrite.webp" alt="Pyrite trading card" width="420" height="588"></a>
-        <a href="gallery.html?card=24-aquari" aria-label="Aquari, Hydro creature"><img src="images/cards/24-aquari.webp" alt="Aquari trading card" width="420" height="588"></a>
-        <a href="gallery.html?card=39-melichtser" aria-label="Melichtser, Magneto creature"><img src="images/cards/39-melichtser.webp" alt="Melichtser trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=03-bloraine" aria-label="Bloraine, Bio creature"><img src="cards/03-bloraine.webp" alt="Bloraine trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=15-pyrite" aria-label="Pyrite, Pyro creature"><img src="cards/15-pyrite.webp" alt="Pyrite trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=24-aquari" aria-label="Aquari, Hydro creature"><img src="cards/24-aquari.webp" alt="Aquari trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=39-melichtser" aria-label="Melichtser, Magneto creature"><img src="cards/39-melichtser.webp" alt="Melichtser trading card" width="420" height="588"></a>
       </div>
     </div>
   </section>
@@ -116,7 +116,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const count = el => CARDS.filter(c => c.el === el).length;
-  $('#el-row').innerHTML = ELEMENTS.map(([k, n]) => `<a class="el-chip" href="gallery.html?element=${k}"><img src="images/elements/${k}.webp" alt="" width="64" height="64">${n}<small>${count(k)} cards</small></a>`).join('');
+  $('#el-row').innerHTML = ELEMENTS.map(([k, n]) => `<a class="el-chip" href="gallery.html?element=${k}"><img src="elements/${k}.webp" alt="" width="64" height="64">${n}<small>${count(k)} cards</small></a>`).join('');
   const cr = CARDS.filter(c => c.type === 'creature').length, ch = CARDS.filter(c => c.type === 'charm').length,
         sp = CARDS.filter(c => c.rarity === 'SP' || c.rarity === 'SSP').length, xs = CARDS.filter(c => c.stage === 'X').length;
   $('#gal-sum').textContent = `Browse all ${CARDS.length} cards in the set. Filter by element or search for a creature by name.`;
