@@ -6,7 +6,7 @@
 <title>Gallery | Creature Catcher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="icon" href="favicon.png" type="image/png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -70,7 +70,7 @@ function match(c) {
 function draw() {
   shown = CARDS.filter(match);
   $('#grid').innerHTML = shown.length ? shown.map((c, i) => `<button class="tile" data-i="${i}" aria-label="${esc(label(c))}, ${esc(sub(c))}">
-      <img src="images/cards/${c.id}.webp" alt="${esc(label(c))} card" width="420" height="588" loading="${i < 12 ? 'eager' : 'lazy'}">
+      <img src="cards/${c.id}.webp" alt="${esc(label(c))} card" width="420" height="588" loading="${i < 12 ? 'eager' : 'lazy'}">
       <span>${esc(label(c))}</span><small>${esc(sub(c))}</small></button>`).join('')
     : '<p class="empty">No cards match these filters. Clear the filters to see all cards.</p>';
   $('#count').textContent = `Showing ${shown.length} of ${CARDS.length} cards`;
@@ -80,7 +80,7 @@ function draw() {
 }
 function open(i) {
   cur = i; const c = shown[i], d = $('#lb');
-  $('#lb-img').src = `images/full/${c.id}.webp`; $('#lb-img').alt = `${label(c)} trading card`;
+  $('#lb-img').src = `full/${c.id}.webp`; $('#lb-img').alt = `${label(c)} trading card`;
   $('#lb-name').textContent = label(c);
   const rows = [['Type', c.type === 'charm' ? 'Charm' : EL[c.el]]];
   if (c.type !== 'element') rows.push(['Card', `${c.n} of 82`]);
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   state.el = ELEMENTS.some(e => e[0] === p.get('element')) ? p.get('element') : '';
   state.q = (p.get('q') || '').toLowerCase(); state.kind = ['creature', 'X', 'charm', 'SP', 'SSP', 'element'].includes(p.get('type')) ? p.get('type') : 'all';
   $('#q').value = state.q; $('#kind').value = state.kind;
-  $('#el-row').innerHTML = ELEMENTS.map(([k, n]) => `<button class="el-chip" type="button" data-el="${k}" aria-pressed="false"><img src="images/elements/${k}.webp" alt="" width="64" height="64">${n}</button>`).join('');
+  $('#el-row').innerHTML = ELEMENTS.map(([k, n]) => `<button class="el-chip" type="button" data-el="${k}" aria-pressed="false"><img src="elements/${k}.webp" alt="" width="64" height="64">${n}</button>`).join('');
   $('#el-row').onclick = e => { const b = e.target.closest('[data-el]'); if (!b) return; state.el = state.el === b.dataset.el ? '' : b.dataset.el; draw(); };
   $('#q').oninput = e => { state.q = e.target.value.trim().toLowerCase(); draw(); };
   $('#kind').onchange = e => { state.kind = e.target.value; draw(); };
