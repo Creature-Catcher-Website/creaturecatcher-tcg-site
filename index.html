@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creature Catcher | Trading card community</title>
+<meta name="description" content="Creature Catcher is a trading card community. Buy packs and boxes, get cards evaluated, and browse the full 1st Edition set.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="est">Est. December 4th, 2025</span>
+        <h1>Join our trading card community</h1>
+        <p>Whether you are a seasoned collector or just opening your first pack, Creature Catcher has cards for you.</p>
+        <div class="hero-actions">
+          <a class="btn" href="shop.html">Shop packs</a>
+          <a class="btn ghost" href="gallery.html">Browse all cards</a>
+        </div>
+      </div>
+      <div class="hand" aria-label="Four creature cards from the 1st Edition set">
+        <a href="gallery.html?card=03-bloraine" aria-label="Bloraine, Bio creature"><img src="images/cards/03-bloraine.webp" alt="Bloraine trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=15-pyrite" aria-label="Pyrite, Pyro creature"><img src="images/cards/15-pyrite.webp" alt="Pyrite trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=24-aquari" aria-label="Aquari, Hydro creature"><img src="images/cards/24-aquari.webp" alt="Aquari trading card" width="420" height="588"></a>
+        <a href="gallery.html?card=39-melichtser" aria-label="Melichtser, Magneto creature"><img src="images/cards/39-melichtser.webp" alt="Melichtser trading card" width="420" height="588"></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip" aria-labelledby="el-h">
+    <div class="wrap">
+      <h2 id="el-h">Ten elements to collect</h2>
+      <p style="color:var(--muted);margin-top:6px">Pick an element to see its cards.</p>
+      <div class="elements" id="el-row"></div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap about-grid">
+      <div>
+        <h2>About Creature Catcher</h2>
+        <p>We are passionate about trading cards. Our mission is to give enthusiasts a place to connect, trade and discover rare finds.</p>
+        <p>We focus on building a lively community so collecting stays fun and rewarding for everyone.</p>
+      </div>
+      <ul class="stat-list">
+        <li><b>Connect</b>Meet other collectors on YouTube and Instagram.</li>
+        <li><b>Trade</b>Swap cards with people who share your interests.</li>
+        <li><b>Discover</b>Find rare cards and new releases first.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section dark" id="services">
+    <div class="wrap">
+      <h2>Our services</h2>
+      <div class="services">
+        <div class="service"><h3>Card evaluation</h3><p>Our experts check the value and authenticity of your trading cards, so you can decide what to keep, sell or trade.</p></div>
+        <div class="service"><h3>Customized collections</h3><p>Tell us what you like and we curate a collection around it, so you get the cards you want.</p></div>
+      </div>
+      <p style="margin-top:32px"><a class="btn" href="#contact">Contact us about services</a></p>
+    </div>
+  </section>
+
+  <section class="section" id="gallery-teaser">
+    <div class="wrap about-grid" style="align-items:center">
+      <div>
+        <h2>The full 1st Edition set</h2>
+        <p id="gal-sum">Every card in the set, from first-stage creatures to special prints.</p>
+        <p style="margin-top:20px"><a class="btn dark" href="gallery.html">Open the gallery</a></p>
+      </div>
+      <ul class="stat-list" id="gal-stats"></ul>
+    </div>
+  </section>
+
+  <section class="section" id="shop-preview" style="padding-top:0">
+    <div class="wrap">
+      <h2>In the shop</h2>
+      <div class="products" id="home-products"></div>
+      <p style="margin-top:24px"><a class="btn dark" href="shop.html">See all products</a></p>
+    </div>
+  </section>
+
+  <section class="section dark" id="contact">
+    <div class="wrap contact-grid">
+      <div>
+        <h2>Contact us</h2>
+        <p style="margin-bottom:24px">Have a question about an order, an evaluation or a collection? Send us a message.</p>
+        <form class="form" id="contact-form" novalidate>
+          <div class="row">
+            <div><label for="fn">First name *</label><input id="fn" required autocomplete="given-name"></div>
+            <div><label for="ln">Last name *</label><input id="ln" required autocomplete="family-name"></div>
+          </div>
+          <div><label for="em">Email *</label><input id="em" type="email" required autocomplete="email"></div>
+          <div><label for="sub">Subject</label><input id="sub"></div>
+          <div><label for="msg">Message *</label><textarea id="msg" rows="5" required></textarea></div>
+          <div id="contact-msg" role="status"></div>
+          <button class="btn" type="submit">Send message</button>
+        </form>
+      </div>
+      <div>
+        <h3>Email</h3><p><a id="contact-email" href="#"></a></p>
+        <h3 style="margin-top:20px">Follow us</h3><p id="follow"></p>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const count = el => CARDS.filter(c => c.el === el).length;
+  $('#el-row').innerHTML = ELEMENTS.map(([k, n]) => `<a class="el-chip" href="gallery.html?element=${k}"><img src="images/elements/${k}.webp" alt="" width="64" height="64">${n}<small>${count(k)} cards</small></a>`).join('');
+  const cr = CARDS.filter(c => c.type === 'creature').length, ch = CARDS.filter(c => c.type === 'charm').length,
+        sp = CARDS.filter(c => c.rarity === 'SP' || c.rarity === 'SSP').length, xs = CARDS.filter(c => c.stage === 'X').length;
+  $('#gal-sum').textContent = `Browse all ${CARDS.length} cards in the set. Filter by element or search for a creature by name.`;
+  $('#gal-stats').innerHTML = [[cr, 'creature cards'], [xs, 'Stage X cards'], [sp, 'special cards'], [ch, 'charm cards']].map(([n, t]) => `<li><b>${n}</b>${t}</li>`).join('');
+  $('#home-products').innerHTML = PRODUCTS.map(productCard).join('');
+  $('#contact-email').href = 'mailto:' + CONFIG.email; $('#contact-email').textContent = CONFIG.email;
+  $('#follow').innerHTML = social();
+  $('#contact-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const msg = $('#contact-msg'), v = id => $('#' + id).value.trim();
+    if (!v('fn') || !v('ln') || !v('em') || !v('msg') || !$('#em').checkValidity()) {
+      msg.className = 'form-msg err'; msg.textContent = 'Fill in your name, a valid email and a message, then send again.'; return;
+    }
+    // Opens the visitor's email app. To send without it, point this at a form service (Formspree, Web3Forms).
+    const body = `From: ${v('fn')} ${v('ln')} (${v('em')})\n\n${v('msg')}`;
+    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(v('sub') || 'Website message')}&body=${encodeURIComponent(body)}`;
+    msg.className = 'form-msg ok'; msg.textContent = 'Your email app should open with the message ready to send.';
+  });
+});
+</script>
+</body>
+</html>
