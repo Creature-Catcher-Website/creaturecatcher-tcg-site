@@ -7,7 +7,7 @@
 <meta name="description" content="The 2026 Creature Catcher informational booklet: timeline, creatures, set lists, how to play and battle decks.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="icon" href="favicon.png" type="image/png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -64,7 +64,7 @@ const SECTIONS = [[4, '2026 timeline'], [6, '2027 planned events'], [7, 'Meet th
 let cur = 1;
 function show(n, push) {
   cur = Math.min(Math.max(n, 1), PAGES.length); const [, title, alt] = PAGES[cur - 1];
-  const img = $('#page'); img.src = `images/booklet/page-${String(cur).padStart(2, '0')}.webp`; img.alt = `Page ${cur}: ${alt}`;
+  const img = $('#page'); img.src = `booklet/page-${String(cur).padStart(2, '0')}.webp`; img.alt = `Page ${cur}: ${alt}`;
   $('#num').textContent = `Page ${cur} of ${PAGES.length}`;
   $('#prev').disabled = cur === 1; $('#next').disabled = cur === PAGES.length; $('#jump').value = cur;
   $$('#toc .jump').forEach((b, i) => { const start = SECTIONS[i][0], end = (SECTIONS[i + 1] || [PAGES.length + 1])[0]; b.setAttribute('aria-current', cur >= start && cur < end); });
