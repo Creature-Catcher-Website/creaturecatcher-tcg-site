@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notifications | Creature Catcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)">Notifications</h1><p>Announcements, restocks and new releases.</p></div></div>
+  <div class="wrap" style="padding:48px 0 88px">
+    <ul class="note-list" id="notes"></ul>
+    <p style="margin-top:20px"><button class="link-btn" id="mark-all">Mark all as read</button></p>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+function draw() {
+  const read = store.get('cc_read', []);
+  $('#notes').innerHTML = NOTIFICATIONS.length ? NOTIFICATIONS.map(n => `
+    <li class="note${read.includes(n.id) ? ' read' : ''}"><div><strong>${esc(n.title)}</strong><p>${esc(n.text)}</p><span class="meta">${esc(n.date)}</span></div>
+    ${read.includes(n.id) ? '' : `<button class="link-btn" data-read="${n.id}">Mark as read</button>`}</li>`).join('')
+    : '<li class="empty">No notifications yet. Check back after our next release.</li>';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  draw();
+  $('#notes').addEventListener('click', e => { const b = e.target.closest('[data-read]'); if (!b) return; store.set('cc_read', [...store.get('cc_read', []), b.dataset.read]); draw(); });
+  $('#mark-all').onclick = () => { store.set('cc_read', NOTIFICATIONS.map(n => n.id)); draw(); };
+});
+</script>
+</body>
+</html>

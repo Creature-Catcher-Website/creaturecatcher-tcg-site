@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog | Creature Catcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)">Blog</h1><p>News, card reveals and updates from the team.</p></div></div>
+  <div class="wrap" style="padding:48px 0 88px" id="posts"></div>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  $('#posts').innerHTML = POSTS.map(p => `
+    <article class="post"><div class="cover"><img src="${p.cover}" alt="" loading="lazy"></div>
+      <div class="txt"><div class="meta">${esc(p.date)} · ${esc(p.read)} · by ${esc(p.author)}</div>
+        <h2 style="font-size:1.6rem">${esc(p.title)}</h2><p>${esc(p.body)}</p>
+        <p style="margin-top:14px"><a href="${CONFIG.youtube}"><strong>Watch on YouTube</strong></a></p></div></article>`).join('');
+});
+</script>
+</body>
+</html>

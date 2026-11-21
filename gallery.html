@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery | Creature Catcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)">Gallery</h1><p>The complete 1st Edition set. Select a card to see it full size.</p></div></div>
+  <div class="wrap" style="padding-bottom:88px">
+    <div class="gal-tools">
+      <div class="grp">
+        <div><label for="q">Search by name</label><input id="q" type="search" placeholder="Try Pyrite"></div>
+        <div><label for="kind">Card type</label>
+          <select id="kind">
+            <option value="all">All cards</option><option value="creature">Creatures</option><option value="X">Stage X</option>
+            <option value="charm">Charms</option><option value="SP">Special</option><option value="SSP">Super special</option><option value="element">Element cards</option>
+          </select></div>
+      </div>
+      <button class="link-btn" id="reset" type="button">Clear filters</button>
+    </div>
+    <div class="elements" id="el-row" role="group" aria-label="Filter by element"></div>
+    <p class="gal-count" id="count" role="status"></p>
+    <div class="card-grid" id="grid"></div>
+  </div>
+</main>
+<dialog class="lb" id="lb" aria-label="Card viewer">
+  <div class="lb-body">
+    <img id="lb-img" alt="">
+    <div class="lb-info">
+      <h2 id="lb-name"></h2>
+      <dl id="lb-meta"></dl>
+      <div class="lb-nav">
+        <button class="btn ghost" id="prev" type="button">Previous</button>
+        <button class="btn ghost" id="next" type="button">Next</button>
+        <button class="btn" id="close" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+const EL = Object.fromEntries(ELEMENTS); EL.charm = 'Charm';
+const RAR = { C: 'Common', U: 'Uncommon', R: 'Rare', SR: 'Super rare', SP: 'Special', SSP: 'Super special' };
+const state = { el: '', q: '', kind: 'all' };
+let shown = [], cur = -1;
+const label = c => c.type === 'element' ? c.name : c.name + (c.stage === 'X' ? ' X' : '');
+const sub = c => c.type === 'element' ? 'Element card' : `${c.n}/82` + (c.rarity === 'SP' ? ' · Special' : c.rarity === 'SSP' ? ' · Super special' : '');
+
+function match(c) {
+  if (state.el && c.el !== state.el) return false;
+  if (state.q && !c.name.toLowerCase().includes(state.q)) return false;
+  const k = state.kind;
+  if (k === 'creature') return c.type === 'creature';
+  if (k === 'X') return c.stage === 'X';
+  if (k === 'charm') return c.type === 'charm';
+  if (k === 'SP') return c.rarity === 'SP';
+  if (k === 'SSP') return c.rarity === 'SSP';
+  if (k === 'element') return c.type === 'element';
+  return true;
+}
+function draw() {
+  shown = CARDS.filter(match);
+  $('#grid').innerHTML = shown.length ? shown.map((c, i) => `<button class="tile" data-i="${i}" aria-label="${esc(label(c))}, ${esc(sub(c))}">
+      <img src="images/cards/${c.id}.webp" alt="${esc(label(c))} card" width="420" height="588" loading="${i < 12 ? 'eager' : 'lazy'}">
+      <span>${esc(label(c))}</span><small>${esc(sub(c))}</small></button>`).join('')
+    : '<p class="empty">No cards match these filters. Clear the filters to see all cards.</p>';
+  $('#count').textContent = `Showing ${shown.length} of ${CARDS.length} cards`;
+  $$('#el-row .el-chip').forEach(b => b.setAttribute('aria-pressed', b.dataset.el === state.el));
+  const u = new URLSearchParams(); if (state.el) u.set('element', state.el); if (state.q) u.set('q', state.q); if (state.kind !== 'all') u.set('type', state.kind);
+  history.replaceState(null, '', u.toString() ? '?' + u : location.pathname);
+}
+function open(i) {
+  cur = i; const c = shown[i], d = $('#lb');
+  $('#lb-img').src = `images/full/${c.id}.webp`; $('#lb-img').alt = `${label(c)} trading card`;
+  $('#lb-name').textContent = label(c);
+  const rows = [['Type', c.type === 'charm' ? 'Charm' : EL[c.el]]];
+  if (c.type !== 'element') rows.push(['Card', `${c.n} of 82`]);
+  if (c.stage) rows.push(['Stage', c.stage === 'X' ? 'Stage X' : 'Stage ' + c.stage]);
+  if (c.rarity) rows.push(['Rarity', RAR[c.rarity]]);
+  $('#lb-meta').innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join('');
+  if (!d.open) d.showModal();
+  $('#prev').disabled = i === 0; $('#next').disabled = i === shown.length - 1;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const p = new URLSearchParams(location.search);
+  state.el = ELEMENTS.some(e => e[0] === p.get('element')) ? p.get('element') : '';
+  state.q = (p.get('q') || '').toLowerCase(); state.kind = ['creature', 'X', 'charm', 'SP', 'SSP', 'element'].includes(p.get('type')) ? p.get('type') : 'all';
+  $('#q').value = state.q; $('#kind').value = state.kind;
+  $('#el-row').innerHTML = ELEMENTS.map(([k, n]) => `<button class="el-chip" type="button" data-el="${k}" aria-pressed="false"><img src="images/elements/${k}.webp" alt="" width="64" height="64">${n}</button>`).join('');
+  $('#el-row').onclick = e => { const b = e.target.closest('[data-el]'); if (!b) return; state.el = state.el === b.dataset.el ? '' : b.dataset.el; draw(); };
+  $('#q').oninput = e => { state.q = e.target.value.trim().toLowerCase(); draw(); };
+  $('#kind').onchange = e => { state.kind = e.target.value; draw(); };
+  $('#reset').onclick = () => { state.el = ''; state.q = ''; state.kind = 'all'; $('#q').value = ''; $('#kind').value = 'all'; draw(); };
+  $('#grid').onclick = e => { const t = e.target.closest('.tile'); if (t) open(+t.dataset.i); };
+  $('#prev').onclick = () => open(cur - 1); $('#next').onclick = () => open(cur + 1);
+  $('#close').onclick = () => $('#lb').close();
+  $('#lb').addEventListener('click', e => { if (e.target === $('#lb')) $('#lb').close(); });
+  $('#lb').addEventListener('keydown', e => { if (e.key === 'ArrowLeft' && cur > 0) open(cur - 1); if (e.key === 'ArrowRight' && cur < shown.length - 1) open(cur + 1); });
+  draw();
+  const want = p.get('card'); if (want) { const i = shown.findIndex(c => c.id === want); if (i >= 0) open(i); }
+});
+</script>
+</body>
+</html>

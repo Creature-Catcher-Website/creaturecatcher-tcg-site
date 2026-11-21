@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in | Creature Catcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)" id="title">Log in</h1></div></div>
+  <div class="wrap" style="padding:48px 0 88px">
+    <div class="panel" style="max-width:520px" id="box"></div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+let mode = 'login';
+const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+async function draw() {
+  const box = $('#box');
+  if (!Auth.enabled()) {
+    $('#title').textContent = 'Accounts';
+    box.innerHTML = '<p>Accounts are not switched on yet. You can still check out as a guest with PayPal.</p>';
+    return;
+  }
+  box.innerHTML = '<p class="empty">Loading…</p>';
+  let user; try { user = await Auth.ready(); } catch { box.innerHTML = '<p class="form-msg err">Accounts could not load. Check your connection and refresh the page.</p>'; return; }
+  if (user) return account(user);
+  const signup = mode === 'signup', reset = mode === 'reset';
+  $('#title').textContent = signup ? 'Create account' : reset ? 'Reset password' : 'Log in';
+  box.innerHTML = `<form class="form" id="f" novalidate>
+    ${signup ? '<div><label for="nm">Name</label><input id="nm" autocomplete="name" required></div>' : ''}
+    <div><label for="e">Email</label><input id="e" type="email" autocomplete="email" required></div>
+    ${reset ? '' : `<div><label for="p">Password</label><input id="p" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required></div>`}
+    <div id="msg" role="alert"></div>
+    <button class="btn dark" type="submit">${signup ? 'Create account' : reset ? 'Send reset link' : 'Log in'}</button>
+    ${mode === 'login' ? '<button class="link-btn" type="button" id="fg">Forgot your password?</button>' : ''}
+    <button class="link-btn" type="button" id="sw">${signup || reset ? 'Back to log in' : 'New here? Create an account'}</button></form>`;
+  $('#sw').onclick = () => { mode = signup || reset ? 'login' : 'signup'; draw(); };
+  if ($('#fg')) $('#fg').onclick = () => { mode = 'reset'; draw(); };
+  $('#f').onsubmit = async e => {
+    e.preventDefault(); const m = $('#msg'), btn = e.submitter; btn.disabled = true;
+    try {
+      if (!$('#e').value.trim() || (!reset && !$('#p').value) || (signup && !$('#nm').value.trim())) throw new Error('Fill in every field, then try again.');
+      if (reset) { await Auth.resetPassword($('#e').value); m.className = 'form-msg ok'; m.textContent = 'If an account exists for that email, a reset link is on its way.'; btn.disabled = false; return; }
+      signup ? await Auth.signup($('#nm').value, $('#e').value, $('#p').value) : await Auth.login($('#e').value, $('#p').value);
+      location.href = 'index.html';
+    } catch (err) { m.className = 'form-msg err'; m.textContent = err.message; btn.disabled = false; }
+  };
+}
+async function account(user) {
+  $('#title').textContent = 'Your account';
+  const name = user.displayName || user.email;
+  $('#box').innerHTML = `<p>Signed in as <strong>${esc(name)}</strong> (${esc(user.email)}).</p>
+    <p style="margin-top:16px"><button class="btn ghost dark" style="color:var(--moss)" id="out">Log out</button></p>
+    <h2 style="font-size:1.3rem;margin-top:28px">Order history</h2><div id="orders"><p class="empty">Loading orders…</p></div>`;
+  $('#out').onclick = async () => { await Auth.logout(); location.reload(); };
+  try {
+    const list = await Orders.list();
+    $('#orders').innerHTML = list.length ? list.map(o => `<div class="line-item"><div><strong>${esc(fmt(o.createdAt))}</strong><br><span style="color:var(--muted)">${(o.items || []).map(i => esc(i.qty + ' × ' + i.name)).join(', ')}</span><br><span style="color:var(--muted);font-size:.88rem">PayPal order ${esc(o.paypalId || '')}</span></div><div>${money(o.total || 0)}</div></div>`).join('')
+      : '<p class="empty">No orders yet. Your orders will show up here after you check out while logged in.</p>';
+  } catch { $('#orders').innerHTML = '<p class="form-msg err">Orders could not load. Refresh the page to try again.</p>'; }
+}
+document.addEventListener('DOMContentLoaded', draw);
+</script>
+</body>
+</html>

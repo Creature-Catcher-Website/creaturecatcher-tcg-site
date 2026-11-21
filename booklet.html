@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026 Booklet | Creature Catcher</title>
+<meta name="description" content="The 2026 Creature Catcher informational booklet: timeline, creatures, set lists, how to play and battle decks.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)">2026 booklet</h1><p>Everything about Creature Catcher in one place: timeline, creatures, set lists and how to play.</p></div></div>
+  <div class="wrap" style="padding-bottom:88px">
+    <div class="book">
+      <aside class="book-side" aria-label="Booklet sections">
+        <a class="btn dark" href="downloads/creature-catcher-2026-booklet.pdf" download>Download PDF</a>
+        <ol id="toc"></ol>
+      </aside>
+      <div class="book-stage">
+        <div class="book-bar">
+          <button class="btn dark" id="prev" type="button">Previous</button>
+          <span id="num" role="status"></span>
+          <button class="btn dark" id="next" type="button">Next</button>
+        </div>
+        <label style="font-weight:600">Jump to page
+          <select id="jump" style="margin-top:4px"></select></label>
+        <img class="book-page" id="page" alt="" width="1575" height="2475">
+      </div>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+// [page image, section title, alt text]
+const PAGES = [
+  [1, 'Cover', 'Informational Booklet 2026 cover with Creature Catcher logo and creatures'],
+  [2, 'Introduction', 'Welcome to the 2026 informational booklet'],
+  [3, 'Contents', 'Contents page listing every section'],
+  [4, '2026 timeline', 'Timeline from the idea in November 2025 to packaging in August 2026'],
+  [5, '2026 timeline, continued', 'Timeline continued: 1st Edition release, final pack sold, battle decks and the Terramarine set'],
+  [6, '2027 planned events', 'Planned events for 2026 and 2027'],
+  [7, 'Meet the creatures', 'Introduction to the creatures'],
+  [8, 'Creature list', 'Creature list, creatures 1 to 25'],
+  [9, 'Creature list, continued', 'Creature list, creatures 26 to 50'],
+  [10, 'Creature list, continued', 'Creature list, creatures 51 to 75'],
+  [11, 'Creature list, continued', 'Creature list, creatures 76 to 100'],
+  [12, 'The card game', 'Parts of a card and what each one means, plus elements'],
+  [13, 'How to use a card', 'Numbered diagram of a card and the rarity levels'],
+  [14, 'How to play the TCG', 'Rules for setting up a game, your turn and your opponent’s turn'],
+  [15, '1st Edition set list', 'Full 1st Edition set list by element'],
+  [16, 'Terramarine set list', 'Terramarine set list'],
+  [17, 'Battle decks', 'Battle deck guides'],
+  [18, 'Battle decks, continued', 'Battle deck guides continued'],
+  [19, 'Fun facts and more info', 'Fun facts about creatures and cards'],
+  [20, 'Back cover', 'Back cover with website, channel and email']
+];
+const SECTIONS = [[4, '2026 timeline'], [6, '2027 planned events'], [7, 'Meet the creatures'], [8, 'Creature list'], [12, 'The card game'], [13, 'How to use a card'], [14, 'How to play the TCG'], [15, 'Set lists'], [17, 'Battle decks'], [19, 'Fun facts']];
+let cur = 1;
+function show(n, push) {
+  cur = Math.min(Math.max(n, 1), PAGES.length); const [, title, alt] = PAGES[cur - 1];
+  const img = $('#page'); img.src = `images/booklet/page-${String(cur).padStart(2, '0')}.webp`; img.alt = `Page ${cur}: ${alt}`;
+  $('#num').textContent = `Page ${cur} of ${PAGES.length}`;
+  $('#prev').disabled = cur === 1; $('#next').disabled = cur === PAGES.length; $('#jump').value = cur;
+  $$('#toc .jump').forEach((b, i) => { const start = SECTIONS[i][0], end = (SECTIONS[i + 1] || [PAGES.length + 1])[0]; b.setAttribute('aria-current', cur >= start && cur < end); });
+  if (push !== false) history.replaceState(null, '', '#page=' + cur);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  $('#toc').innerHTML = SECTIONS.map(([p, t]) => `<li><button class="jump" type="button" data-p="${p}">${t}</button></li>`).join('');
+  $('#jump').innerHTML = PAGES.map(([n, t]) => `<option value="${n}">${n}. ${t}</option>`).join('');
+  $('#toc').onclick = e => { const b = e.target.closest('[data-p]'); if (b) show(+b.dataset.p); };
+  $('#jump').onchange = e => show(+e.target.value);
+  $('#prev').onclick = () => show(cur - 1); $('#next').onclick = () => show(cur + 1);
+  document.addEventListener('keydown', e => { if (e.target.closest('select,input,textarea')) return; if (e.key === 'ArrowLeft') show(cur - 1); if (e.key === 'ArrowRight') show(cur + 1); });
+  const m = location.hash.match(/page=(\d+)/); show(m ? +m[1] : 1, false);
+});
+</script>
+</body>
+</html>

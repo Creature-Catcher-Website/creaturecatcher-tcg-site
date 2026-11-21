@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout | Creature Catcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;600;700;800&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head"><div class="wrap"><h1 style="font-size:clamp(2rem,5vw,3.2rem)">Checkout</h1></div></div>
+  <div class="wrap" style="padding-bottom:88px">
+    <div class="checkout" id="checkout-body">
+      <section class="panel" aria-labelledby="sum-h">
+        <h2 id="sum-h" style="font-size:1.4rem">Order summary</h2>
+        <div id="summary"></div>
+      </section>
+      <section class="panel" aria-labelledby="pay-h">
+        <h2 id="pay-h" style="font-size:1.4rem">Pay</h2>
+        <div id="paypal-box"></div>
+        <div class="notice" id="pp-notice" hidden></div>
+      </section>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+let quote = null;
+function renderSummary() {
+  const lines = Cart.lines();
+  if (!lines.length) {
+    $('#checkout-body').innerHTML = '<section class="panel" style="grid-column:1/-1"><p class="empty">Your cart is empty. <a href="shop.html">Browse the shop</a> to add a pack.</p></section>';
+    return false;
+  }
+  quote = Shipping.quote();
+  const sub = Cart.total();
+  $('#summary').innerHTML = lines.map(l => `<div class="line-item"><div><strong>${esc(l.p.name)}</strong><br><span style="color:var(--muted)">${l.qty} × ${money(unit(l.p))}</span></div><div>${money(unit(l.p) * l.qty)}</div></div>`).join('')
+    + `<div class="line-item" style="margin-top:8px"><span>Subtotal</span><span>${money(sub)}</span></div>
+       <div class="line-item"><span>Shipping (US only)<br><span style="color:var(--muted);font-size:.88rem">${quote ? (quote.oz / 16).toFixed(1) + ' lb package' : ''}</span></span><span>${quote ? money(quote.price) : '—'}</span></div>
+       <div class="subtotal" style="margin-top:16px"><span>Total</span><span>${quote ? money(sub + quote.price) : money(sub)}</span></div>
+       <p style="color:var(--muted);font-size:.92rem">We ship within the United States only. Any sales tax is added by PayPal at payment.</p>`;
+  return true;
+}
+function showNotice(t) { const n = $('#pp-notice'); n.hidden = false; n.textContent = t; }
+
+function loadPayPal() {
+  if (!quote) { showNotice('This order is too heavy to ship online. Remove some items or contact us to arrange shipping.'); return; }
+  if (CONFIG.paypalClientId === 'YOUR_PAYPAL_CLIENT_ID') {
+    showNotice('PayPal is not connected yet. Add your PayPal client ID in js/data.js (CONFIG.paypalClientId) and the PayPal buttons will appear here.');
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(CONFIG.paypalClientId)}&currency=${CONFIG.currency}`;
+  s.onerror = () => showNotice('PayPal could not load. Check your connection and refresh the page.');
+  s.onload = () => paypal.Buttons({
+    createOrder: (d, a) => {
+      const lines = Cart.lines(), cur = CONFIG.currency, q = Shipping.quote();
+      const items = Cart.total().toFixed(2), ship = q.price.toFixed(2), total = (Cart.total() + q.price).toFixed(2);
+      return a.order.create({
+        purchase_units: [{
+          amount: { currency_code: cur, value: total, breakdown: { item_total: { currency_code: cur, value: items }, shipping: { currency_code: cur, value: ship } } },
+          items: lines.map(l => ({ name: l.p.name, quantity: String(l.qty), unit_amount: { currency_code: cur, value: unit(l.p).toFixed(2) } }))
+        }],
+        application_context: { shipping_preference: 'GET_FROM_FILE' }
+      });
+    },
+    onShippingChange: (data, actions) => data.shipping_address && data.shipping_address.country_code !== CONFIG.shipping.country ? actions.reject() : actions.resolve(),
+    onApprove: (d, a) => a.order.capture().then(o => {
+      const lines = Cart.lines(), q = Shipping.quote();
+      Orders.save({ paypalId: o.id, items: lines.map(l => ({ name: l.p.name, qty: l.qty, unit: unit(l.p) })), subtotal: Cart.total(), shipping: q.price, total: Cart.total() + q.price });
+      Cart.clear();
+      $('#checkout-body').innerHTML = `<section class="panel" style="grid-column:1/-1"><h2>Thank you for your order</h2><p>Payment received. Your PayPal order number is <strong>${esc(o.id)}</strong>. A receipt is on its way to your PayPal email.</p><p style="margin-top:16px"><a class="btn dark" href="shop.html">Keep shopping</a></p></section>`;
+    }),
+    onError: () => showNotice('Payment did not go through. Nothing was charged. Try again or use a different payment method.')
+  }).render('#paypal-box');
+  document.head.append(s);
+}
+document.addEventListener('DOMContentLoaded', () => { if (renderSummary()) loadPayPal(); });
+</script>
+</body>
+</html>
